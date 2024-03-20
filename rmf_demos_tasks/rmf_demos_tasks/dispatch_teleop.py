@@ -66,6 +66,8 @@ class TaskRequester(Node):
             action='store_true',
             help='Use sim time, default: false',
         )
+        parser.add_argument('-e', '--emergency_lots', required=False, default='',
+                            type=str, nargs='+', help='Emergency waypoints')
 
         self.args = parser.parse_args(argv[1:])
         self.response = asyncio.Future()
@@ -131,13 +133,33 @@ class TaskRequester(Node):
                 },
             }
         )
+        # Set up cancellation behavior
+        on_cancel = []
+        emergency_lots = []
+        if self.args.emergency_lots:
+            for lot in self.args.emergency_lots:
+                emergency_lots.append({"waypoint": lot})
+        cancellation_desc = {
+            "one_of": emergency_lots,
+            "constraints": [{
+                "category": "prefer_same_map",
+                "description": "some description"
+            }]
+        }
+        cancellation_activities = []
+        cancellation_activities.append({"category": "go_to_place",
+                                        "description": cancellation_desc})
+        on_cancel.append(
+            {"category": "sequence",
+            "description": cancellation_activities})
         # Add activities to phases
         description['phases'].append(
             {
                 'activity': {
                     'category': 'sequence',
                     'description': {'activities': activities},
-                }
+                },
+                "on_cancel": on_cancel
             }
         )
         request['description'] = description

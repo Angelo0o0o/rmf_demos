@@ -30,6 +30,7 @@ setup(
             'dispatch_loop = rmf_demos_tasks.dispatch_loop:main',
             'dispatch_action = rmf_demos_tasks.dispatch_action:main',
             'dispatch_patrol = rmf_demos_tasks.dispatch_patrol:main',
+            'dispatch_teleop = rmf_demos_tasks.dispatch_teleop:main',
             'dispatch_delivery = rmf_demos_tasks.dispatch_delivery:main',
             'dispatch_clean = rmf_demos_tasks.dispatch_clean:main',
             'dispatch_go_to_place = rmf_demos_tasks.dispatch_go_to_place:main',
