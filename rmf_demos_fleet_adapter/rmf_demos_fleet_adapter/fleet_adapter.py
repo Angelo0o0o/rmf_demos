@@ -143,6 +143,8 @@ def initialize_fleet(config_yaml, nav_graph_path, node, use_sim_time):
             f"Fleet [{fleet_name}] is configured to perform Clean tasks")
         task_capabilities.append(TaskType.TYPE_CLEAN)
 
+    
+
     # Callable for validating requests that this fleet can accommodate
     def _task_request_check(task_capabilities, msg: TaskProfile):
         if msg.description.task_type in task_capabilities:
@@ -208,13 +210,22 @@ def initialize_fleet(config_yaml, nav_graph_path, node, use_sim_time):
     robots = {}
     missing_robots = config_yaml['robots']
 
+
+    
     def _add_fleet_robots():
         while len(missing_robots) > 0:
             time.sleep(0.2)
             for robot_name in list(missing_robots.keys()):
-                node.get_logger().debug(f"Connecting to robot: {robot_name}")
+                #node.get_logger().info(f"Connecting to robot: {robot_name}")
+
+                #PROBLEM HERE
+
                 data = api.data(robot_name)
+                #node.get_logger().info(f"DATA: {data}")
+                #node.get_logger().info(f"PREFIX: {prefix}")
+
                 if data is None:
+                    #node.get_logger().info(f"HERE 1")
                     continue
                 if data['success']:
                     node.get_logger().info(f"Initializing robot: {robot_name}")

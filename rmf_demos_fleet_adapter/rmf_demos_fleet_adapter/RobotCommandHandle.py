@@ -90,7 +90,7 @@ class RobotCommandHandle(adpt.RobotCommandHandle):
         self.update_frequency = update_frequency
         self.lane_merge_distance = lane_merge_distance
         self.update_handle = None  # RobotUpdateHandle
-        self.battery_soc = 1.0
+        self.battery_soc = 0.5
         self.api = api
         self.position = position  # (x,y,theta) in RMF crs (meters,radians)
         self.initialized = False

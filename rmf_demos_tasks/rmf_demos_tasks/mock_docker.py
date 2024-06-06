@@ -120,6 +120,18 @@ class MockDocker(Node):
         self.dock_summary_publisher.publish(dock_summary)
 
     def mode_request_cb(self, msg: ModeRequest):
+        
+        # self.get_logger().warn(
+        #         "FLEET_NAME = %s\n"
+        #         "ROBOT_NAME = %s\n"
+        #         "MODE = %d\n"
+        #         "MODE_REQUEST_ID = %d\n"
+        #         "TASK_ID = %s\n"
+        #         "PARAMETER_NAME = %s\n"
+        #         "PARAMETER_VALUE = %s",
+        #         msg.fleet_name, msg.robot_name,msg.mode.mode, msg.mode.mode_request_id,
+        #         msg.parameters[0].name, msg.parameters[0].value)
+
         if msg.mode.mode != RobotMode.MODE_DOCKING:
             return
 
@@ -136,13 +148,16 @@ class MockDocker(Node):
         fleet_name = self.dock_map.get(msg.fleet_name)
         if fleet_name is None:
             self.get_logger().warn(
-                'Unknown fleet name requested [{msg.fleet_name}].')
+                f'Unknown fleet name requested [{msg.fleet_name}].')
             return
 
         dock = fleet_name.get(msg.parameters[0].value)
+        self.get_logger().warn(f'DOCK NAME REQUESTED = [{msg.parameters[0].value}]')
         if not dock:
             self.get_logger().warn(
                 f'Unknown dock name requested [{msg.parameters[0].value}]')
+            
+            #raise Exception        
             return
 
         self.get_logger().info(
@@ -152,9 +167,22 @@ class MockDocker(Node):
         path_request.robot_name = msg.robot_name
         path_request.task_id = msg.task_id
         path_request.path = dock
+        #for Location in path_request.path:
+            #tmp =  time.monotonic()
+            #self.get_logger().info(
+            #f'Received Docking Mode Request from [{tmp}]')
+            #Location.sec = tmp.sec
+            #Location.nanosec = tmp.nanosec
         self.watching[msg.robot_name] = path_request
+        self.get_logger().info(f' [{path_request.fleet_name}]')
+        self.get_logger().info(f' [{path_request.robot_name}]')
+        self.get_logger().info(f' [{path_request.task_id}]')
+        self.get_logger().info(f' [{path_request.path}]')
+        
+
 
         self.path_request_publisher.publish(path_request)
+        self.get_logger().info('      H  E  R  E     1')
 
     def robot_state_cb(self, msg: RobotState):
         robot_name = msg.name
@@ -163,24 +191,30 @@ class MockDocker(Node):
 
         requested_path = self.watching[msg.name]
         finish_location = requested_path.path[-1]
+        self.get_logger().info('       H  E  R  E      2')
         if not close(finish_location, msg.location):
             return
 
         # This is needed to acknowledge the slot car that a Docking Mode
         # is completed. Subsequently, this will update the robot_state and
         # inform the Fleet adapter that the robot has finished docking
+        self.get_logger().info('       H  E  R  E      3')
         mode_request = ModeRequest()
         mode_request.fleet_name = requested_path.fleet_name
         mode_request.robot_name = requested_path.robot_name
         mode_request.task_id = requested_path.task_id
         mode_request.mode.mode = RobotMode.MODE_PAUSED
+        self.get_logger().info('       H  E  R  E      4')
         self.mode_request_publisher.publish(mode_request)
+        self.get_logger().info('       H  E  R  E      5')
 
         # Remove from watching, when it is no longer in Docking
         if msg.mode.mode != RobotMode.MODE_DOCKING:
             self.watching.pop(robot_name)
             self.get_logger().info(
                 f'{robot_name} done with docking at {finish_location}')
+
+        
 
 
 def main(argv=sys.argv):

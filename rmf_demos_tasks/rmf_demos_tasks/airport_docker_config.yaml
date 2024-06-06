@@ -6,7 +6,7 @@
 #     finish_waypoint: The name of the waypoint where the robot will end up at the end of the docking process
 
 
-cleanerBotA:
+burger:
   zone_1:
     level_name: "L1"
     path: [ [121.3, -26.76, 0.0],
